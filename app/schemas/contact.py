@@ -3,12 +3,12 @@ from typing import Optional
 from datetime import datetime
 
 class ContactBase(BaseModel):
-    name: str = Field(..., example="Sarah Connor")
-    email: str = Field(..., example="sarah@cyberdyne.io")
-    phone: str = Field(..., example="+1-800-555-0144")
-    company: Optional[str] = Field(None, example="Cyberdyne Systems")
+    name: str = Field(..., example="Nimal Perera")
+    email: str = Field(..., example="nimal@gmail.com")
+    phone: str = Field(..., example="0754578973")
+    company: Optional[str] = Field(None, example="decryptogen")
     category: str = Field("Work", example="Work") # "Work", "Personal"
-    notes: Optional[str] = Field(None, example="Security lead")
+    notes: Optional[str] = Field(None, example="Software Engineer")
 
 class ContactCreate(ContactBase):
     pass
