@@ -1,9 +1,9 @@
-import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Contact Book Platform"
     API_V1_STR: str = "/api/v1"
+    PORT: int = 8000
     MONGODB_URL: str = "mongodb://localhost:27017"
     DATABASE_NAME: str = "contact_book_db"
     SECRET_KEY: str = "local_testing_secret_key_12345"
