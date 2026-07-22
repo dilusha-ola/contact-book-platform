@@ -1,1 +1,218 @@
-<!-- Contact Book Platform Admin Dashboard UI -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Book Platform - Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Top Navbar (Mobile View) -->
+        <header class="mobile-navbar">
+            <div class="brand">
+                <span class="brand-icon">📇</span>
+                <h2>Contact Platform</h2>
+            </div>
+            <button class="hamburger-btn" onclick="toggleMobileMenu()">☰</button>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand desktop-only">
+                <span class="brand-icon">📇</span>
+                <h2>Contact Platform</h2>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-btn active" onclick="switchNav('dashboard', this)">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-btn" onclick="switchNav('contacts', this)">
+                    <span class="nav-icon">📇</span> Contacts
+                </button>
+                <button class="nav-btn" onclick="switchNav('companies', this)">
+                    <span class="nav-icon">🏢</span> Companies
+                </button>
+                <button class="nav-btn" onclick="switchNav('settings', this)">
+                    <span class="nav-icon">⚙️</span> Settings
+                </button>
+                <a href="/docs" target="_blank" class="nav-btn docs-link">
+                    <span class="nav-icon">⚡</span> Swagger Docs
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>MongoDB Atlas Connected</p>
+                <span class="badge badge-online">Live</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="top-header">
+                <h1 id="page-title">Dashboard Overview</h1>
+                <div class="header-status">
+                    <span class="status-dot"></span> Port 8000 (Local)
+                </div>
+            </header>
+
+            <!-- SECTION 1: Dashboard View -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-title">Total Contacts</span>
+                        <span class="stat-value" id="stat-total">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Total Companies</span>
+                        <span class="stat-value" id="stat-companies">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Work Contacts</span>
+                        <span class="stat-value" id="stat-work">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Personal Contacts</span>
+                        <span class="stat-value" id="stat-personal">0</span>
+                    </div>
+                </div>
+
+                <div class="table-toolbar">
+                    <h2>Recent Contacts</h2>
+                    <button class="btn btn-primary" onclick="openCreateModal()">+ Add Contact</button>
+                </div>
+
+                <div class="card table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Company</th>
+                                    <th>Category</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: All Contacts View -->
+            <section id="view-contacts" class="view-section">
+                <div class="table-toolbar flex-wrap">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search by name, email, company..." onkeyup="filterContacts()">
+                        <select id="category-filter" onchange="filterContacts()">
+                            <option value="All">All Categories</option>
+                            <option value="Work">Work</option>
+                            <option value="Personal">Personal</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="openCreateModal()">+ Create Contact</button>
+                </div>
+
+                <div class="card table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Company</th>
+                                    <th>Category</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contacts-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: Companies View -->
+            <section id="view-companies" class="view-section">
+                <div class="card p-24">
+                    <h2>Companies Directory</h2>
+                    <p class="text-muted mb-16">Grouped contact counts per organization.</p>
+                    <div id="companies-grid" class="companies-grid">
+                        <!-- Dynamic company cards -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: Settings View -->
+            <section id="view-settings" class="view-section">
+                <div class="card p-24 max-w-500">
+                    <h2>Platform Configuration</h2>
+                    <p class="text-muted mb-20">MongoDB Atlas connection & local server status.</p>
+                    <div class="form-group">
+                        <label>Platform API URL</label>
+                        <input type="text" value="http://localhost:8000/api/v1/contacts" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Database Engine</label>
+                        <input type="text" value="MongoDB Atlas Cloud" readonly>
+                    </div>
+                    <button class="btn btn-secondary" onclick="fetchPlatformData()">🔄 Refresh Data</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Form (Create / Edit Contact) -->
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Create New Contact</h2>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <form id="contact-form" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="form-contact-id">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="form-name" required placeholder="Sarah Connor">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="form-email" required placeholder="sarah@cyberdyne.io">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="form-phone" required placeholder="+1-800-555-0144">
+                </div>
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" id="form-company" placeholder="Cyberdyne Systems">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="form-category">
+                        <option value="Work">Work</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="form-notes" rows="2" placeholder="Optional notes..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
