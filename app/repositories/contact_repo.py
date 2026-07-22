@@ -19,12 +19,31 @@ class ContactRepository:
         db = get_database()
         return db["contacts"] if db is not None else None
 
-    async def get_all(self, query: Optional[str] = None, category: Optional[str] = None) -> List[dict]:
+    async def get_all(
+        self,
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+        company: Optional[str] = None,
+        category: Optional[str] = None,
+        query: Optional[str] = None
+    ) -> List[dict]:
         col = self.get_collection()
         if col is None:
             return []
 
         filter_dict = {}
+
+        # Specific field filters
+        if name:
+            filter_dict["name"] = {"$regex": name, "$options": "i"}
+        if email:
+            filter_dict["email"] = {"$regex": email, "$options": "i"}
+        if company:
+            filter_dict["company"] = {"$regex": company, "$options": "i"}
+        if category and category.lower() != "all":
+            filter_dict["category"] = {"$regex": f"^{category}$", "$options": "i"}
+
+        # General search filter across name, email, or company
         if query:
             regex_query = {"$regex": query, "$options": "i"}
             filter_dict["$or"] = [
@@ -32,8 +51,6 @@ class ContactRepository:
                 {"email": regex_query},
                 {"company": regex_query}
             ]
-        if category and category != "All":
-            filter_dict["category"] = {"$regex": f"^{category}$", "$options": "i"}
 
         cursor = col.find(filter_dict).sort("created_at", -1)
         contacts = []
@@ -52,6 +69,11 @@ class ContactRepository:
         col = self.get_collection()
         data["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data["is_valid"] = validate_email_format(data["email"])
+        
+        # Auto-category rule: if company is provided default to Work, else Personal
+        if not data.get("category"):
+            data["category"] = "Work" if data.get("company") else "Personal"
+
         result = await col.insert_one(data)
         data["id"] = str(result.inserted_id)
         data.pop("_id", None)

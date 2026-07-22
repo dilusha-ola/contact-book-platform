@@ -5,17 +5,26 @@ from app.services.contact_service import contact_service
 
 router = APIRouter(prefix="/contacts", tags=["Contact CRUD APIs"])
 
-@router.get("", response_model=List[ContactResponse], summary="List / Search Contacts")
+@router.get("", response_model=List[ContactResponse], summary="List / Filter Contacts")
 async def list_contacts(
-    query: Optional[str] = Query(None, description="Search term for name, email, or company"),
-    category: Optional[str] = Query(None, description="Filter by category ('Work', 'Personal')")
+    name: Optional[str] = Query(None, description="Filter specifically by name (e.g. Nimal)"),
+    email: Optional[str] = Query(None, description="Filter specifically by email (e.g. nimal@gmail.com)"),
+    company: Optional[str] = Query(None, description="Filter specifically by company (e.g. decryptogen)"),
+    category: Optional[str] = Query(None, description="Filter by category ('Work', 'Personal')"),
+    query: Optional[str] = Query(None, description="General search across name, email, or company")
 ):
-    """List all contacts stored in MongoDB with optional search query and category filtering."""
-    return await contact_service.get_all_contacts(query=query, category=category)
+    """List contacts with multi-parameter filtering (e.g. ?name=Nimal&email=nimal@gmail.com)."""
+    return await contact_service.get_all_contacts(
+        name=name,
+        email=email,
+        company=company,
+        category=category,
+        query=query
+    )
 
 @router.post("", response_model=ContactResponse, status_code=status.HTTP_201_CREATED, summary="Create Contact")
 async def create_contact(payload: ContactCreate):
-    """Create a new contact entry in the MongoDB Atlas database."""
+    """Create a new contact entry in MongoDB Atlas."""
     return await contact_service.create_contact(payload.model_dump())
 
 @router.get("/stats", summary="Get Platform Stats")

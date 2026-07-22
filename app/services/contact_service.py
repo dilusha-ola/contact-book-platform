@@ -1,8 +1,22 @@
+from typing import Optional
 from app.repositories.contact_repo import contact_repo
 
 class ContactService:
-    async def get_all_contacts(self, query: str = None, category: str = None):
-        return await contact_repo.get_all(query=query, category=category)
+    async def get_all_contacts(
+        self,
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+        company: Optional[str] = None,
+        category: Optional[str] = None,
+        query: Optional[str] = None
+    ):
+        return await contact_repo.get_all(
+            name=name,
+            email=email,
+            company=company,
+            category=category,
+            query=query
+        )
 
     async def get_contact_by_id(self, contact_id: str):
         return await contact_repo.get_by_id(contact_id)
