@@ -33,4 +33,7 @@ class ContactService:
     async def get_stats(self):
         return await contact_repo.get_stats()
 
+    async def get_companies(self):
+        return await contact_repo.get_companies()
+
 contact_service = ContactService()

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchPlatformData() {
     await fetchStats();
     await fetchContacts();
+    await fetchCompanies();
 }
 
 async function fetchStats() {
@@ -28,9 +29,18 @@ async function fetchContacts() {
         allContacts = await res.json();
         renderDashboardTable(allContacts);
         renderContactsTable(allContacts);
-        renderCompaniesGrid(allContacts);
     } catch (err) {
         console.error("Error fetching contacts:", err);
+    }
+}
+
+async function fetchCompanies() {
+    try {
+        const res = await fetch("/api/v1/companies");
+        const companies = await res.json();
+        renderCompaniesGrid(companies);
+    } catch (err) {
+        console.error("Error fetching companies:", err);
     }
 }
 
@@ -75,27 +85,25 @@ function createRow(c) {
     return tr;
 }
 
-function renderCompaniesGrid(contacts) {
+function renderCompaniesGrid(companies) {
     const grid = document.getElementById("companies-grid");
     grid.innerHTML = "";
-    const map = {};
-    contacts.forEach(c => {
-        const comp = c.company || "Independent / Unspecified";
-        map[comp] = (map[comp] || 0) + 1;
-    });
 
-    const keys = Object.keys(map);
-    if (keys.length === 0) {
+    if (!companies || companies.length === 0) {
         grid.innerHTML = `<p style="color: var(--text-muted);">No company records found.</p>`;
         return;
     }
 
-    keys.forEach(comp => {
+    companies.forEach(item => {
         const card = document.createElement("div");
         card.className = "company-card";
+        const membersList = (item.members || []).map(m => `<li>👤 ${escapeHtml(m.name)} (${escapeHtml(m.email)})</li>`).join("");
         card.innerHTML = `
-            <h3>🏢 ${escapeHtml(comp)}</h3>
-            <p style="color: var(--text-secondary); font-size: 13px; margin-top: 6px;">${map[comp]} Contact(s)</p>
+            <h3>🏢 ${escapeHtml(item.company)}</h3>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-top: 6px; font-weight: 600;">${item.contact_count} Contact(s)</p>
+            <ul style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; list-style: none; padding: 0;">
+                ${membersList}
+            </ul>
         `;
         grid.appendChild(card);
     });

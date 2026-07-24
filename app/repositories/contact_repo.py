@@ -114,4 +114,29 @@ class ContactRepository:
             "personal_contacts": personal
         }
 
+    async def get_companies(self) -> List[dict]:
+        col = self.get_collection()
+        if col is None:
+            return []
+
+        pipeline = [
+            {"$match": {"company": {"$ne": None, "$exists": True, "$ne": ""}}},
+            {"$group": {
+                "_id": "$company",
+                "contact_count": {"$sum": 1},
+                "members": {"$push": {"id": {"$toString": "$_id"}, "name": "$name", "email": "$email", "phone": "$phone"}}
+            }},
+            {"$project": {
+                "company": "$_id",
+                "contact_count": 1,
+                "members": 1,
+                "_id": 0
+            }},
+            {"$sort": {"company": 1}}
+        ]
+        companies = []
+        async for doc in col.aggregate(pipeline):
+            companies.append(doc)
+        return companies
+
 contact_repo = ContactRepository()
