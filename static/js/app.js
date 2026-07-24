@@ -1,3 +1,11 @@
+const API_KEY = "platform_secure_api_key_998877";
+
+async function apiFetch(url, options = {}) {
+    options.headers = options.headers || {};
+    options.headers["X-API-Key"] = API_KEY;
+    return await fetch(url, options);
+}
+
 let allContacts = [];
 let allCompanies = [];
 
@@ -13,11 +21,11 @@ async function fetchPlatformData() {
 
 async function fetchStats() {
     try {
-        const resContacts = await fetch("/api/v1/contacts/stats");
+        const resContacts = await apiFetch("/api/v1/contacts/stats");
         const dataContacts = await resContacts.json();
         document.getElementById("stat-total").innerText = dataContacts.total_contacts || 0;
 
-        const resCompanies = await fetch("/api/v1/companies/stats");
+        const resCompanies = await apiFetch("/api/v1/companies/stats");
         const dataCompanies = await resCompanies.json();
         document.getElementById("stat-companies").innerText = dataCompanies.total_companies || 0;
     } catch (err) {
@@ -27,7 +35,7 @@ async function fetchStats() {
 
 async function fetchContacts() {
     try {
-        const res = await fetch("/api/v1/contacts");
+        const res = await apiFetch("/api/v1/contacts");
         allContacts = await res.json();
         renderDashboardTable(allContacts);
         renderContactsTable(allContacts);
@@ -38,7 +46,7 @@ async function fetchContacts() {
 
 async function fetchCompanies() {
     try {
-        const res = await fetch("/api/v1/companies");
+        const res = await apiFetch("/api/v1/companies");
         allCompanies = await res.json();
         renderCompaniesTable(allCompanies);
     } catch (err) {
@@ -53,7 +61,7 @@ function renderDashboardTable(contacts) {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 20px;">No personal contacts stored. Click "+ Add Contact" to create one!</td></tr>`;
         return;
     }
-    contacts.slice(0, 5).forEach(c => {
+    contacts.forEach(c => {
         tbody.appendChild(createContactRow(c));
     });
 }
@@ -192,13 +200,13 @@ async function handleContactSubmit(e) {
     try {
         let res;
         if (id) {
-            res = await fetch(`/api/v1/contacts/${id}`, {
+            res = await apiFetch(`/api/v1/contacts/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
         } else {
-            res = await fetch("/api/v1/contacts", {
+            res = await apiFetch("/api/v1/contacts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -220,7 +228,7 @@ async function deleteContact(id) {
     if (!confirm("Are you sure you want to delete this personal contact?")) return;
 
     try {
-        const res = await fetch(`/api/v1/contacts/${id}`, { method: "DELETE" });
+        const res = await apiFetch(`/api/v1/contacts/${id}`, { method: "DELETE" });
         if (res.ok) {
             fetchPlatformData();
         } else {
@@ -272,13 +280,13 @@ async function handleCompanySubmit(e) {
     try {
         let res;
         if (id) {
-            res = await fetch(`/api/v1/companies/${id}`, {
+            res = await apiFetch(`/api/v1/companies/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
         } else {
-            res = await fetch("/api/v1/companies", {
+            res = await apiFetch("/api/v1/companies", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -300,7 +308,7 @@ async function deleteCompany(id) {
     if (!confirm("Are you sure you want to delete this company contact?")) return;
 
     try {
-        const res = await fetch(`/api/v1/companies/${id}`, { method: "DELETE" });
+        const res = await apiFetch(`/api/v1/companies/${id}`, { method: "DELETE" });
         if (res.ok) {
             fetchPlatformData();
         } else {
