@@ -6,15 +6,11 @@ class ContactService:
         self,
         name: Optional[str] = None,
         email: Optional[str] = None,
-        company: Optional[str] = None,
-        category: Optional[str] = None,
         query: Optional[str] = None
     ):
         return await contact_repo.get_all(
             name=name,
             email=email,
-            company=company,
-            category=category,
             query=query
         )
 
@@ -32,8 +28,5 @@ class ContactService:
 
     async def get_stats(self):
         return await contact_repo.get_stats()
-
-    async def get_companies(self):
-        return await contact_repo.get_companies()
 
 contact_service = ContactService()

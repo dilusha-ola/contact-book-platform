@@ -346,6 +346,7 @@ body {
     border-collapse: collapse;
     text-align: left;
     font-size: 14px;
+    table-layout: auto;
 }
 
 .data-table th {
@@ -359,6 +360,13 @@ body {
 .data-table td {
     padding: 14px 18px;
     border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+    text-align: right;
+    white-space: nowrap;
 }
 
 .badge {

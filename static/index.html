@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Book Platform - Admin Dashboard</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=20260724_2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -29,7 +29,7 @@
                     <span class="nav-icon">📊</span> Dashboard
                 </button>
                 <button class="nav-btn" onclick="switchNav('contacts', this)">
-                    <span class="nav-icon">📇</span> Contacts
+                    <span class="nav-icon">👤</span> Contacts
                 </button>
                 <button class="nav-btn" onclick="switchNav('companies', this)">
                     <span class="nav-icon">🏢</span> Companies
@@ -61,26 +61,18 @@
             <section id="view-dashboard" class="view-section active">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <span class="stat-title">Total Contacts</span>
+                        <span class="stat-title">Personal Contacts</span>
                         <span class="stat-value" id="stat-total">0</span>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-title">Total Companies</span>
+                        <span class="stat-title">Company Contacts</span>
                         <span class="stat-value" id="stat-companies">0</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-title">Work Contacts</span>
-                        <span class="stat-value" id="stat-work">0</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-title">Personal Contacts</span>
-                        <span class="stat-value" id="stat-personal">0</span>
                     </div>
                 </div>
 
                 <div class="table-toolbar">
-                    <h2>Recent Contacts</h2>
-                    <button class="btn btn-primary" onclick="openCreateModal()">+ Add Contact</button>
+                    <h2>Recent Personal Contacts</h2>
+                    <button class="btn btn-primary" onclick="openContactModal()">+ Add Contact</button>
                 </div>
 
                 <div class="card table-container">
@@ -91,8 +83,6 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Company</th>
-                                    <th>Category</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -104,18 +94,13 @@
                 </div>
             </section>
 
-            <!-- SECTION 2: All Contacts View -->
+            <!-- SECTION 2: Personal Contacts View -->
             <section id="view-contacts" class="view-section">
                 <div class="table-toolbar flex-wrap">
                     <div class="search-box">
-                        <input type="text" id="search-input" placeholder="Search by name, email, company..." onkeyup="filterContacts()">
-                        <select id="category-filter" onchange="filterContacts()">
-                            <option value="All">All Categories</option>
-                            <option value="Work">Work</option>
-                            <option value="Personal">Personal</option>
-                        </select>
+                        <input type="text" id="search-input" placeholder="Search by name, email, or phone..." onkeyup="filterContacts()">
                     </div>
-                    <button class="btn btn-primary" onclick="openCreateModal()">+ Create Contact</button>
+                    <button class="btn btn-primary" onclick="openContactModal()">+ Create Contact</button>
                 </div>
 
                 <div class="card table-container">
@@ -126,8 +111,6 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Company</th>
-                                    <th>Category</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -141,11 +124,29 @@
 
             <!-- SECTION 3: Companies View -->
             <section id="view-companies" class="view-section">
-                <div class="card p-24">
-                    <h2>Companies Directory</h2>
-                    <p class="text-muted mb-16">Grouped contact counts per organization.</p>
-                    <div id="companies-grid" class="companies-grid">
-                        <!-- Dynamic company cards -->
+                <div class="table-toolbar flex-wrap">
+                    <div class="search-box">
+                        <input type="text" id="company-search-input" placeholder="Search company by name, email, location..." onkeyup="filterCompanies()">
+                    </div>
+                    <button class="btn btn-primary" onclick="openCompanyModal()">+ Create Company Contact</button>
+                </div>
+
+                <div class="card table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Company Email</th>
+                                    <th>Phone</th>
+                                    <th>Location</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companies-table-body">
+                                <!-- Dynamic Company Rows -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -157,7 +158,7 @@
                     <p class="text-muted mb-20">MongoDB Atlas connection & local server status.</p>
                     <div class="form-group">
                         <label>Platform API URL</label>
-                        <input type="text" value="http://localhost:8000/api/v1/contacts" readonly>
+                        <input type="text" value="http://localhost:8000/api/v1" readonly>
                     </div>
                     <div class="form-group">
                         <label>Database Engine</label>
@@ -169,50 +170,76 @@
         </main>
     </div>
 
-    <!-- Modal Form (Create / Edit Contact) -->
+    <!-- Modal Form (Create / Edit Personal Contact) -->
     <div id="contact-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="modal-title">Create New Contact</h2>
-                <button class="close-btn" onclick="closeModal()">✕</button>
+                <h2 id="contact-modal-title">Create Personal Contact</h2>
+                <button class="close-btn" onclick="closeContactModal()">✕</button>
             </div>
-            <form id="contact-form" onsubmit="handleFormSubmit(event)">
+            <form id="contact-form" onsubmit="handleContactSubmit(event)">
                 <input type="hidden" id="form-contact-id">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="form-name" required placeholder="Sarah Connor">
+                    <input type="text" id="form-contact-name" required placeholder="Tharushi">
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" id="form-email" required placeholder="sarah@cyberdyne.io">
+                    <input type="email" id="form-contact-email" required placeholder="tharushi@gmail.com">
                 </div>
                 <div class="form-group">
                     <label>Phone Number</label>
-                    <input type="text" id="form-phone" required placeholder="+1-800-555-0144">
-                </div>
-                <div class="form-group">
-                    <label>Company</label>
-                    <input type="text" id="form-company" placeholder="Cyberdyne Systems">
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="form-category">
-                        <option value="Work">Work</option>
-                        <option value="Personal">Personal</option>
-                    </select>
+                    <input type="text" id="form-contact-phone" required placeholder="0763334445">
                 </div>
                 <div class="form-group">
                     <label>Notes</label>
-                    <textarea id="form-notes" rows="2" placeholder="Optional notes..."></textarea>
+                    <textarea id="form-contact-notes" rows="2" placeholder="Optional notes..."></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeContactModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Contact</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="/js/app.js"></script>
+    <!-- Modal Form (Create / Edit Company Contact) -->
+    <div id="company-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="company-modal-title">Create Company Contact</h2>
+                <button class="close-btn" onclick="closeCompanyModal()">✕</button>
+            </div>
+            <form id="company-form" onsubmit="handleCompanySubmit(event)">
+                <input type="hidden" id="form-company-id">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="form-company-name" required placeholder="Decryptogen">
+                </div>
+                <div class="form-group">
+                    <label>Company Email</label>
+                    <input type="email" id="form-company-email" required placeholder="contact@decryptogen.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="form-company-phone" required placeholder="0112345678">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="form-company-location" required placeholder="Colombo, Sri Lanka">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="form-company-notes" rows="2" placeholder="Optional notes..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCompanyModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Company</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/app.js?v=20260724_2"></script>
 </body>
 </html>
