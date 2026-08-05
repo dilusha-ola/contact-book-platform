@@ -6,15 +6,11 @@ class ContactService:
         self,
         name: Optional[str] = None,
         email: Optional[str] = None,
-        company: Optional[str] = None,
-        category: Optional[str] = None,
         query: Optional[str] = None
     ):
         return await contact_repo.get_all(
             name=name,
             email=email,
-            company=company,
-            category=category,
             query=query
         )
 
