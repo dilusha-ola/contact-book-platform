@@ -6,6 +6,8 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1.router import api_router
 from app.db.session import connect_to_mongo, close_mongo_connection
 from app.core.config import settings
+# pyrefly: ignore [missing-import]
+from mudraid_middleware import MudraIDMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,6 +23,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Enforce MudraID authorization token and scope validation
+app.add_middleware(MudraIDMiddleware)
 
 # Enable CORS for local testing & Agent Bot integration
 app.add_middleware(
