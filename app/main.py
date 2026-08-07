@@ -5,9 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api.v1.router import api_router
 from app.db.session import connect_to_mongo, close_mongo_connection
-from app.core.config import settings
+from starlette.middleware.base import BaseHTTPMiddleware
 # pyrefly: ignore [missing-import]
 from mudraid_middleware import MudraIDMiddleware
+from app.core.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,6 +18,20 @@ async def lifespan(app: FastAPI):
     # Shutdown event: Close MongoDB connection
     await close_mongo_connection()
 
+# Scopes MudraID validation to requests carrying a Bearer token (Bot Agent calls).
+# Browser UI calls without Bearer tokens pass directly to normal route handlers.
+class ScopedMudraIDMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app):
+        super().__init__(app)
+        self.mudraid = MudraIDMiddleware(app)
+
+    async def dispatch(self, request, call_next):
+        if request.url.path.startswith("/api/"):
+            auth_header = request.headers.get("authorization", "")
+            if auth_header.startswith("Bearer "):
+                return await self.mudraid.dispatch(request, call_next)
+        return await call_next(request)
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Enterprise Contact Book Platform RESTful APIs powered by MongoDB Atlas.",
@@ -24,8 +39,8 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enforce MudraID authorization token and scope validation
-app.add_middleware(MudraIDMiddleware)
+# Enforce MudraID authorization on Bot Agent calls
+app.add_middleware(ScopedMudraIDMiddleware)
 
 # Enable CORS for local testing & Agent Bot integration
 app.add_middleware(

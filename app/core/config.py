@@ -5,7 +5,7 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "Contact Book Platform"
     API_V1_STR: str = "/api/v1"
-    PORT: int = 8000
+    PORT: int = 8005
     MONGODB_URL: str = ""
     DATABASE_NAME: str = "contact_book_db"
     API_KEY: str = ""

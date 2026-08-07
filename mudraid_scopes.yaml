@@ -1,5 +1,15 @@
-platform_id: 4f8e9c1d-2b4f-5e6a-7b8c-9d0e1f2a3b4c
 version: 1
+platform_id: 9bc92a6c-e231-477b-b509-f276c21af2ba
+scopes:
+  - name: companies:read
+    group: companies
+    description: "Read-only access to company contact data"
+  - name: companies:write
+    group: companies
+    description: "Create, update, and delete access for company contact data"
+  - name: contacts:write
+    group: contacts
+    description: "Create, update, and delete access for personal contact data"
 routes:
   # Public & static endpoints
   - method: GET
@@ -11,28 +21,22 @@ routes:
   - method: GET
     path: /health
     public: true
+  - method: GET
+    path: /css/*
+    public: true
+  - method: GET
+    path: /js/*
+    public: true
 
-  # Personal Contacts endpoints
-  - method: GET
-    path: /api/v1/contacts
-    scope: contacts:read
-  - method: GET
-    path: /api/v1/contacts/stats
-    scope: contacts:read
-  - method: GET
-    path: /api/v1/contacts/{contact_id}
-    scope: contacts:read
   - method: POST
     path: /api/v1/contacts
     scope: contacts:write
   - method: PUT
-    path: /api/v1/contacts/{contact_id}
+    path: /api/v1/contacts/*
     scope: contacts:write
   - method: DELETE
-    path: /api/v1/contacts/{contact_id}
+    path: /api/v1/contacts/*
     scope: contacts:write
-
-  # Company Contacts endpoints
   - method: GET
     path: /api/v1/companies
     scope: companies:read
@@ -40,14 +44,14 @@ routes:
     path: /api/v1/companies/stats
     scope: companies:read
   - method: GET
-    path: /api/v1/companies/{company_id}
+    path: /api/v1/companies/*
     scope: companies:read
   - method: POST
     path: /api/v1/companies
     scope: companies:write
   - method: PUT
-    path: /api/v1/companies/{company_id}
+    path: /api/v1/companies/*
     scope: companies:write
   - method: DELETE
-    path: /api/v1/companies/{company_id}
+    path: /api/v1/companies/*
     scope: companies:write
