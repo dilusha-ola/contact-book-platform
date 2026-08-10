@@ -56,7 +56,11 @@ async def lifespan(app: FastAPI):
 class ScopedMudraIDMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
-        self.mudraid = MudraIDMiddleware(app)
+        jwks_url = os.environ.get("MUDRAID_JWKS_URL")
+        if jwks_url:
+            self.mudraid = MudraIDMiddleware(app, jwks_url=jwks_url)
+        else:
+            self.mudraid = MudraIDMiddleware(app)
 
     async def dispatch(self, request, call_next):
         if request.url.path.startswith("/api/"):
