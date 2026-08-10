@@ -65,10 +65,7 @@ class ScopedMudraIDMiddleware(BaseHTTPMiddleware):
                 response = await self.mudraid.dispatch(request, call_next)
 
                 if response.status_code >= 400:
-                    body = b""
-                    async for chunk in response.body_iterator:
-                        body += chunk
-
+                    body = getattr(response, "body", b"")
                     error_code = "UNKNOWN_ERROR"
                     message = "An error occurred"
                     try:
@@ -76,7 +73,7 @@ class ScopedMudraIDMiddleware(BaseHTTPMiddleware):
                         error_code = data.get("error_code", "UNKNOWN_ERROR")
                         message = data.get("message", body.decode("utf-8"))
                     except Exception:
-                        message = body.decode("utf-8")
+                        message = body.decode("utf-8") if isinstance(body, bytes) else str(body)
 
                     info = TROUBLESHOOTING_MAP_PLATFORM.get(error_code, {
                         "meaning": message,
