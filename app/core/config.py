@@ -10,5 +10,8 @@ class Settings(BaseSettings):
     DATABASE_NAME: str = "contact_book_db"
     API_KEY: str = ""
     ENVIRONMENT: str = "development"
+    MUDRAID_JWKS_URL: str = "https://api.staging.mudraid.ai/.well-known/jwks.json"
+    MUDRAID_PLATFORM_API_KEY: str = ""
+    MUDRAID_PLATFORM_SECRET: str = ""
 
 settings = Settings()
