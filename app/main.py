@@ -12,7 +12,7 @@ from app.db.session import connect_to_mongo, close_mongo_connection
 from app.core.config import settings
 
 # pyrefly: ignore [missing-import]
-from mudraid_middleware import MudraIDMiddleware
+from mudraid_platform_middleware import MudraIDMiddleware
 
 logger = logging.getLogger("uvicorn")
 
