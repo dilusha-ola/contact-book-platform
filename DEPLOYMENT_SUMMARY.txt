@@ -2,6 +2,7 @@
 CONTACT BOOK PLATFORM - DEPLOYMENT & CONFIGURATION SUMMARY
 ====================================================================
 Date Configured: 2026-08-06
+Last Updated: 2026-08-12
 Server IP: 13.235.48.164
 Assigned Port: 8005
 User: ubuntu
@@ -20,12 +21,15 @@ DATABASE_NAME="contact_book_db"
 API_KEY="platform_secure_api_key_998877"
 ENVIRONMENT="production"
 
-3. RECENT CODE & DEPENDENCY CHANGES:
-------------------------------------
-- Added requirements for FastAPI, Uvicorn, Motor, PyMongo, Pydantic, Python-Dotenv.
-- Configured local SDK dependency for mudraid-middleware when needed.
-- Updated main.py for FastAPI lifespan and route handling.
-- Configured .gitignore to ignore .env, .venv/, __pycache__/, and mudraid_scopes.yaml.
+3. RECENT CODE & DEPENDENCY CHANGES (2026-08-12):
+--------------------------------------------------
+- Upgraded MudraID Middleware package to `mudraid-platform-middleware==1.1.0`.
+- Added Test PyPI index (`https://test.pypi.org/simple/`) and standard PyPI fallback to `requirements.txt`.
+- Updated middleware import in `app/main.py` to `from mudraid_platform_middleware import MudraIDMiddleware`.
+- Uninstalled legacy `mudraid-middleware 0.2.0` package from server virtualenv.
+- Updated server working directory path to `/home/ubuntu/dilusha/contact-book-platform`.
+- Updated service startup command to `nohup python -m uvicorn app.main:app --host 0.0.0.0 --port 8005 > platform.log 2>&1 &`.
+- Confirmed live operation and log streaming via `platform.log`.
 
 4. SERVER DEPLOYMENT COMMANDS:
 ------------------------------
