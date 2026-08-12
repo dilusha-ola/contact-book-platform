@@ -1,0 +1,47 @@
+====================================================================
+CONTACT BOOK PLATFORM - DEPLOYMENT & CONFIGURATION SUMMARY
+====================================================================
+Date Configured: 2026-08-06
+Server IP: 13.235.48.164
+Assigned Port: 8005
+User: ubuntu
+
+1. OVERVIEW & RESPONSIBILITY:
+-----------------------------
+This service acts as the RESTful backend API for the Contact Book Platform.
+It handles user/contact persistence using MongoDB Atlas and provides data endpoints.
+
+2. ENVIRONMENT VARIABLES (.env on Server):
+-------------------------------------------
+PROJECT_NAME="Contact Book Platform"
+PORT=8005
+MONGODB_URL="mongodb+srv://dilushaolaboduwa3_db_user:SQkne6DbCcyyBQC9@contact-book-platform.uhvhdfc.mongodb.net/?appName=contact-book-platform"
+DATABASE_NAME="contact_book_db"
+API_KEY="platform_secure_api_key_998877"
+ENVIRONMENT="production"
+
+3. RECENT CODE & DEPENDENCY CHANGES:
+------------------------------------
+- Added requirements for FastAPI, Uvicorn, Motor, PyMongo, Pydantic, Python-Dotenv.
+- Configured local SDK dependency for mudraid-middleware when needed.
+- Updated main.py for FastAPI lifespan and route handling.
+- Configured .gitignore to ignore .env, .venv/, __pycache__/, and mudraid_scopes.yaml.
+
+4. SERVER DEPLOYMENT COMMANDS:
+------------------------------
+Location on Server: /home/ubuntu/dilusha/contact-book-platform
+
+# Activate Environment:
+source .venv/bin/activate
+
+# Start Background Process:
+nohup .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8005 > platform.log 2>&1 &
+
+# View Logs:
+cat /home/ubuntu/dilusha/contact-book-platform/platform.log
+
+5. LIVE PUBLIC ENDPOINTS:
+------------------------
+Interactive Swagger Docs: http://13.235.48.164:8005/docs
+API Base URL: http://13.235.48.164:8005/api/v1
+====================================================================
