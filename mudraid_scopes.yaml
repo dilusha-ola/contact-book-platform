@@ -10,6 +10,9 @@ scopes:
   - name: contacts:write
     group: contacts
     description: "Create, update, and delete access for personal contact data"
+  - name: contacts:read
+    group: contacts
+    description: "Read access for personal contact data"
 routes:
   # Public & static endpoints
   - method: GET
@@ -27,7 +30,20 @@ routes:
   - method: GET
     path: /js/*
     public: true
+  - method: POST
+    path: /api/v1/webhooks/mudraid
+    public: true
 
+
+  - method: GET
+    path: /api/v1/contacts
+    scope: contacts:read
+  - method: GET
+    path: /api/v1/contacts/stats
+    scope: contacts:read
+  - method: GET
+    path: /api/v1/contacts/*
+    scope: contacts:read
   - method: POST
     path: /api/v1/contacts
     scope: contacts:write

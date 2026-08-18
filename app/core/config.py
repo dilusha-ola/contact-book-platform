@@ -13,5 +13,6 @@ class Settings(BaseSettings):
     MUDRAID_JWKS_URL: str = "https://api.staging.mudraid.ai/.well-known/jwks.json"
     MUDRAID_PLATFORM_API_KEY: str = ""
     MUDRAID_PLATFORM_SECRET: str = ""
+    MUDRAID_WEBHOOK_SECRET: str = ""
 
 settings = Settings()
