@@ -42,17 +42,18 @@ routes:
     path: /api/v1/contacts/stats
     scope: contacts:read
   - method: GET
-    path: /api/v1/contacts/*
+    path: /api/v1/contacts/{contact_id}
     scope: contacts:read
   - method: POST
     path: /api/v1/contacts
     scope: contacts:write
   - method: PUT
-    path: /api/v1/contacts/*
+    path: /api/v1/contacts/{contact_id}
     scope: contacts:write
   - method: DELETE
-    path: /api/v1/contacts/*
+    path: /api/v1/contacts/{contact_id}
     scope: contacts:write
+
   - method: GET
     path: /api/v1/companies
     scope: companies:read
@@ -60,14 +61,14 @@ routes:
     path: /api/v1/companies/stats
     scope: companies:read
   - method: GET
-    path: /api/v1/companies/*
+    path: /api/v1/companies/{company_id}
     scope: companies:read
   - method: POST
     path: /api/v1/companies
     scope: companies:write
   - method: PUT
-    path: /api/v1/companies/*
+    path: /api/v1/companies/{company_id}
     scope: companies:write
   - method: DELETE
-    path: /api/v1/companies/*
+    path: /api/v1/companies/{company_id}
     scope: companies:write
