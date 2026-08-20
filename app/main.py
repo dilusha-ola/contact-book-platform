@@ -132,11 +132,15 @@ async def root_health_check():
 @app.post("/", summary="Universal Discovery Probe Handshake", tags=["API Discovery"])
 @app.get("/api/v1", summary="Universal Discovery Probe Handshake", tags=["API Discovery"])
 @app.post("/api/v1", summary="Universal Discovery Probe Handshake", tags=["API Discovery"])
+@app.get("/mcp", summary="MCP Discovery Endpoint", tags=["API Discovery"])
+@app.post("/mcp", summary="MCP Discovery Endpoint", tags=["API Discovery"])
+@app.get("/api/v1/mcp", summary="MCP API Discovery Endpoint", tags=["API Discovery"])
+@app.post("/api/v1/mcp", summary="MCP API Discovery Endpoint", tags=["API Discovery"])
 async def universal_discovery_handshake(request: Request):
     """
     Universal Discovery Probe endpoint supporting:
     1. OpenAPI 3.1.0 specification auto-discovery
-    2. MCP (Model Context Protocol) JSON-RPC 2.0 (initialize & tools/list)
+    2. MCP (Model Context Protocol) JSON-RPC 2.0 (initialize, ping, tools/list)
     """
     try:
         body = await request.body()
@@ -164,7 +168,19 @@ async def universal_discovery_handshake(request: Request):
             }
         }
 
-    # 2. Handle MCP JSON-RPC 'tools/list' probe
+    # 2. Handle MCP JSON-RPC 'ping' probe
+    if method == "ping":
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {}
+        }
+
+    # 3. Handle MCP notifications
+    if method == "notifications/initialized":
+        return {"jsonrpc": "2.0"}
+
+    # 4. Handle MCP JSON-RPC 'tools/list' probe
     if method == "tools/list":
         return {
             "jsonrpc": "2.0",

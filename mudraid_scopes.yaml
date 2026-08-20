@@ -43,6 +43,18 @@ routes:
     path: /api/v1
     public: true
   - method: GET
+    path: /mcp
+    public: true
+  - method: POST
+    path: /mcp
+    public: true
+  - method: GET
+    path: /api/v1/mcp
+    public: true
+  - method: POST
+    path: /api/v1/mcp
+    public: true
+  - method: GET
     path: /api/v1/health
     public: true
   - method: POST
