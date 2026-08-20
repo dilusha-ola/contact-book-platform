@@ -124,6 +124,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health", summary="Platform Health Check", tags=["Health"])
+async def root_health_check():
+    return {"status": "ok", "service": "contact-book-platform"}
+
 # 1. Mount API Router (/api/v1)
 app.include_router(api_router, prefix=settings.API_V1_STR)
 

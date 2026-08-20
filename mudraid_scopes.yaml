@@ -30,8 +30,20 @@ routes:
   - method: GET
     path: /js/*
     public: true
+  - method: GET
+    path: /api/v1
+    public: true
+  - method: POST
+    path: /api/v1
+    public: true
+  - method: GET
+    path: /api/v1/health
+    public: true
   - method: POST
     path: /api/v1/webhooks/mudraid
+    public: true
+  - method: POST
+    path: /api/v1/webhooks/delivery-destination
     public: true
 
 
