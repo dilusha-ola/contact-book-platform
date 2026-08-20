@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.api.v1.router import api_router
 from app.db.session import connect_to_mongo, close_mongo_connection
@@ -288,8 +288,28 @@ async def universal_discovery_handshake(request: Request):
 # 1. Mount API Router (/api/v1)
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-# 2. Mount Static Web UI (No Jinja2 required)
+# 2. Static directory resolution
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 STATIC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "static"))
 
-app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+# 3. Smart Root GET Handler: Serves Web UI HTML to browsers, and OpenAPI discovery to MudraID probes
+@app.get("/", summary="Root Endpoint (Browser UI & Discovery Probe)", include_in_schema=False)
+async def root_get(request: Request):
+    accept = request.headers.get("accept", "")
+    # If a real browser is loading the website, serve the index.html UI
+    if "text/html" in accept:
+        index_path = os.path.join(STATIC_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    # Otherwise (API client, MudraID discovery probe), return OpenAPI / JSON Discovery Handshake
+    return await universal_discovery_handshake(request)
+
+# 4. Mount Static Assets (/css and /js)
+css_dir = os.path.join(STATIC_DIR, "css")
+js_dir = os.path.join(STATIC_DIR, "js")
+if os.path.exists(css_dir):
+    app.mount("/css", StaticFiles(directory=css_dir), name="css")
+if os.path.exists(js_dir):
+    app.mount("/js", StaticFiles(directory=js_dir), name="js")
+app.mount("/static", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
