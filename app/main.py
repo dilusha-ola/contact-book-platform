@@ -142,8 +142,19 @@ async def universal_discovery_handshake(request: Request):
     1. OpenAPI 3.1.0 specification auto-discovery
     2. MCP (Model Context Protocol) JSON-RPC 2.0 (initialize, ping, tools/list)
     """
+    # === DEBUG: Log every detail of the incoming probe request ===
+    body = await request.body()
+    body_text = body.decode("utf-8", errors="replace") if body else "(empty)"
+    logger.warning(
+        f"🔍 DISCOVERY PROBE RECEIVED:\n"
+        f"  HTTP Method: {request.method}\n"
+        f"  Path: {request.url.path}\n"
+        f"  Full URL: {request.url}\n"
+        f"  Headers: {dict(request.headers)}\n"
+        f"  Body: {body_text[:2000]}"
+    )
+
     try:
-        body = await request.body()
         data = json.loads(body.decode("utf-8")) if body else {}
     except Exception:
         data = {}
