@@ -164,11 +164,15 @@ async def universal_discovery_handshake(request: Request):
 
     # 1. Handle MCP JSON-RPC 'initialize' probe
     if method == "initialize":
-        return {
+        # Echo the client's requested protocolVersion for compatibility
+        client_protocol = data.get("params", {}).get("protocolVersion", "2025-11-25")
+        import uuid
+        session_id = str(uuid.uuid4())
+        response_body = {
             "jsonrpc": "2.0",
             "id": req_id,
             "result": {
-                "protocolVersion": "2024-11-05",
+                "protocolVersion": client_protocol,
                 "capabilities": {
                     "tools": {"listChanged": False}
                 },
@@ -178,18 +182,23 @@ async def universal_discovery_handshake(request: Request):
                 }
             }
         }
+        logger.warning(f"🔍 INITIALIZE RESPONSE: {json.dumps(response_body)}")
+        return JSONResponse(
+            content=response_body,
+            headers={"Mcp-Session-Id": session_id}
+        )
 
     # 2. Handle MCP JSON-RPC 'ping' probe
     if method == "ping":
-        return {
+        return JSONResponse(content={
             "jsonrpc": "2.0",
             "id": req_id,
             "result": {}
-        }
+        })
 
     # 3. Handle MCP notifications
     if method == "notifications/initialized":
-        return {"jsonrpc": "2.0"}
+        return JSONResponse(content={"jsonrpc": "2.0"}, status_code=200)
 
     # 4. Handle MCP JSON-RPC 'tools/list' probe
     if method == "tools/list":
