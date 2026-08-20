@@ -2,7 +2,7 @@ import os
 import logging
 import json
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
@@ -129,22 +129,161 @@ app.add_middleware(
 async def root_health_check():
     return {"status": "ok", "service": "contact-book-platform"}
 
-@app.post("/", summary="Root Discovery Probe Handshake", tags=["API Discovery"])
-async def root_post_handshake():
-    return {
-        "status": "ok",
-        "service": "contact-book-platform",
-        "version": "1.0.0",
-        "discovery": "ready",
-        "endpoints": {
-            "api": "/api/v1",
-            "contacts": "/api/v1/contacts",
-            "companies": "/api/v1/companies",
-            "health": "/health",
-            "webhooks": "/api/v1/webhooks/mudraid",
-            "openapi": "/openapi.json"
+@app.post("/", summary="Universal Discovery Probe Handshake", tags=["API Discovery"])
+@app.get("/api/v1", summary="Universal Discovery Probe Handshake", tags=["API Discovery"])
+@app.post("/api/v1", summary="Universal Discovery Probe Handshake", tags=["API Discovery"])
+async def universal_discovery_handshake(request: Request):
+    """
+    Universal Discovery Probe endpoint supporting:
+    1. OpenAPI 3.1.0 specification auto-discovery
+    2. MCP (Model Context Protocol) JSON-RPC 2.0 (initialize & tools/list)
+    """
+    try:
+        body = await request.body()
+        data = json.loads(body.decode("utf-8")) if body else {}
+    except Exception:
+        data = {}
+
+    method = data.get("method")
+    req_id = data.get("id", 1)
+
+    # 1. Handle MCP JSON-RPC 'initialize' probe
+    if method == "initialize":
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {
+                    "tools": {"listChanged": False}
+                },
+                "serverInfo": {
+                    "name": "contact-book-platform",
+                    "version": "1.0.0"
+                }
+            }
         }
-    }
+
+    # 2. Handle MCP JSON-RPC 'tools/list' probe
+    if method == "tools/list":
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {
+                "tools": [
+                    {
+                        "name": "list_contacts",
+                        "description": "List and search personal contacts",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string", "description": "Filter by name"},
+                                "email": {"type": "string", "description": "Filter by email"},
+                                "query": {"type": "string", "description": "General search query"}
+                            }
+                        }
+                    },
+                    {
+                        "name": "create_contact",
+                        "description": "Create a new personal contact",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "email": {"type": "string"},
+                                "phone": {"type": "string"},
+                                "notes": {"type": "string"}
+                            },
+                            "required": ["name", "email", "phone"]
+                        }
+                    },
+                    {
+                        "name": "update_contact",
+                        "description": "Update an existing personal contact by ID",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "contact_id": {"type": "string"},
+                                "name": {"type": "string"},
+                                "email": {"type": "string"},
+                                "phone": {"type": "string"},
+                                "notes": {"type": "string"}
+                            },
+                            "required": ["contact_id"]
+                        }
+                    },
+                    {
+                        "name": "delete_contact",
+                        "description": "Delete a personal contact by ID",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "contact_id": {"type": "string"}
+                            },
+                            "required": ["contact_id"]
+                        }
+                    },
+                    {
+                        "name": "list_companies",
+                        "description": "List and search company contacts",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "company_email": {"type": "string"},
+                                "location": {"type": "string"},
+                                "query": {"type": "string"}
+                            }
+                        }
+                    },
+                    {
+                        "name": "create_company",
+                        "description": "Create a new company contact",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "company_email": {"type": "string"},
+                                "phone": {"type": "string"},
+                                "location": {"type": "string"},
+                                "notes": {"type": "string"}
+                            },
+                            "required": ["name", "company_email", "phone", "location"]
+                        }
+                    },
+                    {
+                        "name": "update_company",
+                        "description": "Update an existing company contact by ID",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "company_id": {"type": "string"},
+                                "name": {"type": "string"},
+                                "company_email": {"type": "string"},
+                                "phone": {"type": "string"},
+                                "location": {"type": "string"},
+                                "notes": {"type": "string"}
+                            },
+                            "required": ["company_id"]
+                        }
+                    },
+                    {
+                        "name": "delete_company",
+                        "description": "Delete a company contact by ID",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "company_id": {"type": "string"}
+                            },
+                            "required": ["company_id"]
+                        }
+                    }
+                ]
+            }
+        }
+
+    # 3. Default to returning the full OpenAPI 3.1.0 schema
+    return app.openapi()
 
 # 1. Mount API Router (/api/v1)
 app.include_router(api_router, prefix=settings.API_V1_STR)
