@@ -202,124 +202,127 @@ async def universal_discovery_handshake(request: Request):
 
     # 4. Handle MCP JSON-RPC 'tools/list' probe
     if method == "tools/list":
-        return {
+        tools_list = [
+            {
+                "name": "list_contacts",
+                "description": "List and search personal contacts",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string", "description": "Filter by name"},
+                        "email": {"type": "string", "description": "Filter by email"},
+                        "query": {"type": "string", "description": "General search query"}
+                    }
+                }
+            },
+            {
+                "name": "create_contact",
+                "description": "Create a new personal contact",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "notes": {"type": "string"}
+                    },
+                    "required": ["name", "email", "phone"]
+                }
+            },
+            {
+                "name": "update_contact",
+                "description": "Update an existing personal contact by ID",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "contact_id": {"type": "string"},
+                        "name": {"type": "string"},
+                        "email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "notes": {"type": "string"}
+                    },
+                    "required": ["contact_id"]
+                }
+            },
+            {
+                "name": "delete_contact",
+                "description": "Delete a personal contact by ID",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "contact_id": {"type": "string"}
+                    },
+                    "required": ["contact_id"]
+                }
+            },
+            {
+                "name": "list_companies",
+                "description": "List and search company contacts",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "company_email": {"type": "string"},
+                        "location": {"type": "string"},
+                        "query": {"type": "string"}
+                    }
+                }
+            },
+            {
+                "name": "create_company",
+                "description": "Create a new company contact",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "company_email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "location": {"type": "string"},
+                        "notes": {"type": "string"}
+                    },
+                    "required": ["name", "company_email", "phone", "location"]
+                }
+            },
+            {
+                "name": "update_company",
+                "description": "Update an existing company contact by ID",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "company_id": {"type": "string"},
+                        "name": {"type": "string"},
+                        "company_email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "location": {"type": "string"},
+                        "notes": {"type": "string"}
+                    },
+                    "required": ["company_id"]
+                }
+            },
+            {
+                "name": "delete_company",
+                "description": "Delete a company contact by ID",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "company_id": {"type": "string"}
+                    },
+                    "required": ["company_id"]
+                }
+            }
+        ]
+        logger.warning(f"🔍 TOOLS/LIST RESPONSE: Returning {len(tools_list)} MCP tools to discovery probe")
+        return JSONResponse(content={
             "jsonrpc": "2.0",
             "id": req_id,
             "result": {
-                "tools": [
-                    {
-                        "name": "list_contacts",
-                        "description": "List and search personal contacts",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "name": {"type": "string", "description": "Filter by name"},
-                                "email": {"type": "string", "description": "Filter by email"},
-                                "query": {"type": "string", "description": "General search query"}
-                            }
-                        }
-                    },
-                    {
-                        "name": "create_contact",
-                        "description": "Create a new personal contact",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "name": {"type": "string"},
-                                "email": {"type": "string"},
-                                "phone": {"type": "string"},
-                                "notes": {"type": "string"}
-                            },
-                            "required": ["name", "email", "phone"]
-                        }
-                    },
-                    {
-                        "name": "update_contact",
-                        "description": "Update an existing personal contact by ID",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "contact_id": {"type": "string"},
-                                "name": {"type": "string"},
-                                "email": {"type": "string"},
-                                "phone": {"type": "string"},
-                                "notes": {"type": "string"}
-                            },
-                            "required": ["contact_id"]
-                        }
-                    },
-                    {
-                        "name": "delete_contact",
-                        "description": "Delete a personal contact by ID",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "contact_id": {"type": "string"}
-                            },
-                            "required": ["contact_id"]
-                        }
-                    },
-                    {
-                        "name": "list_companies",
-                        "description": "List and search company contacts",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "name": {"type": "string"},
-                                "company_email": {"type": "string"},
-                                "location": {"type": "string"},
-                                "query": {"type": "string"}
-                            }
-                        }
-                    },
-                    {
-                        "name": "create_company",
-                        "description": "Create a new company contact",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "name": {"type": "string"},
-                                "company_email": {"type": "string"},
-                                "phone": {"type": "string"},
-                                "location": {"type": "string"},
-                                "notes": {"type": "string"}
-                            },
-                            "required": ["name", "company_email", "phone", "location"]
-                        }
-                    },
-                    {
-                        "name": "update_company",
-                        "description": "Update an existing company contact by ID",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "company_id": {"type": "string"},
-                                "name": {"type": "string"},
-                                "company_email": {"type": "string"},
-                                "phone": {"type": "string"},
-                                "location": {"type": "string"},
-                                "notes": {"type": "string"}
-                            },
-                            "required": ["company_id"]
-                        }
-                    },
-                    {
-                        "name": "delete_company",
-                        "description": "Delete a company contact by ID",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "company_id": {"type": "string"}
-                            },
-                            "required": ["company_id"]
-                        }
-                    }
-                ]
+                "tools": tools_list
             }
-        }
+        })
 
-    # 3. Default to returning the full OpenAPI 3.1.0 schema
-    return app.openapi()
+    # 5. Default to returning the full OpenAPI 3.1.0 schema
+    logger.warning("🔍 OPENAPI SCHEMA RESPONSE: Returning full OpenAPI 3.1 schema to discovery probe")
+    return JSONResponse(content=app.openapi())
 
 # 1. Mount API Router (/api/v1)
 app.include_router(api_router, prefix=settings.API_V1_STR)
