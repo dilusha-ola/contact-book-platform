@@ -18,10 +18,16 @@ routes:
   - method: GET
     path: /
     public: true
+  - method: POST
+    path: /
+    public: true
   - method: GET
     path: /index.html
     public: true
   - method: GET
+    path: /health
+    public: true
+  - method: POST
     path: /health
     public: true
   - method: GET

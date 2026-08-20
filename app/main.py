@@ -125,8 +125,26 @@ app.add_middleware(
 )
 
 @app.get("/health", summary="Platform Health Check", tags=["Health"])
+@app.post("/health", summary="Platform Health Check (POST)", tags=["Health"])
 async def root_health_check():
     return {"status": "ok", "service": "contact-book-platform"}
+
+@app.post("/", summary="Root Discovery Probe Handshake", tags=["API Discovery"])
+async def root_post_handshake():
+    return {
+        "status": "ok",
+        "service": "contact-book-platform",
+        "version": "1.0.0",
+        "discovery": "ready",
+        "endpoints": {
+            "api": "/api/v1",
+            "contacts": "/api/v1/contacts",
+            "companies": "/api/v1/companies",
+            "health": "/health",
+            "webhooks": "/api/v1/webhooks/mudraid",
+            "openapi": "/openapi.json"
+        }
+    }
 
 # 1. Mount API Router (/api/v1)
 app.include_router(api_router, prefix=settings.API_V1_STR)
