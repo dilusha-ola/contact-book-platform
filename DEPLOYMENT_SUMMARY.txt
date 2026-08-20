@@ -21,12 +21,15 @@ DATABASE_NAME="contact_book_db"
 API_KEY="platform_secure_api_key_998877"
 ENVIRONMENT="production"
 MUDRAID_JWKS_URL="https://api.staging.mudraid.ai/.well-known/jwks.json"
-MUDRAID_PLATFORM_API_KEY="mudraid_test_ICNofpwfCRh2MV2GrQZRld2LyBtFLCxlCF/fl72ig6I="
-MUDRAID_PLATFORM_SECRET="mudraid_secret_CfNuzst3y8QQ3j81JXDqGLJgxm7a2iMuaBuKZGaKxmk="
+MUDRAID_PLATFORM_API_KEY="mudraid_test_GZk9mkh9PZuunLiz2Pq9oZHNJwLnfR2WA8mBFUuhJK0="
+MUDRAID_PLATFORM_SECRET="mudraid_secret_h5egsDJgkRS4YAbbPd4IRV7rXPEcbpBWsSFmuzLErms="
 MUDRAID_WEBHOOK_SECRET="PVypAQHzMO5xTqXPAuY136D4OOYbzHeE0gSeWut85/A="
+MUDRAID_DELIVERY_DESTINATION_SECRET="jqhqaK_DtofZMLGiS0bzzuj2YvPxlfd7fhWe7WsoA5c"
 
-3. RECENT CODE & DEPENDENCY CHANGES (2026-08-12):
+3. RECENT CODE & DEPENDENCY CHANGES:
 --------------------------------------------------
+- Added dedicated Delivery Destination webhook endpoint: `POST /api/v1/webhooks/delivery-destination`.
+- Added `MUDRAID_DELIVERY_DESTINATION_SECRET` setting for isolated evidence destination HMAC verification.
 - Upgraded MudraID Middleware package to `mudraid-platform-middleware==1.1.0`.
 - Added Test PyPI index (`https://test.pypi.org/simple/`) and standard PyPI fallback to `requirements.txt`.
 - Updated middleware import in `app/main.py` to `from mudraid_platform_middleware import MudraIDMiddleware`.
@@ -52,4 +55,6 @@ cat /home/ubuntu/dilusha/contact-book-platform/platform.log
 ------------------------
 Interactive Swagger Docs: http://13.235.48.164:8005/docs
 API Base URL: http://13.235.48.164:8005/api/v1
+MudraID Platform Events Webhook: http://13.235.48.164:8005/api/v1/webhooks/mudraid
+MudraID Delivery Destination Webhook: http://13.235.48.164:8005/api/v1/webhooks/delivery-destination
 ====================================================================

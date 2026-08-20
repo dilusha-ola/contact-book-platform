@@ -14,5 +14,6 @@ class Settings(BaseSettings):
     MUDRAID_PLATFORM_API_KEY: str = ""
     MUDRAID_PLATFORM_SECRET: str = ""
     MUDRAID_WEBHOOK_SECRET: str = ""
+    MUDRAID_DELIVERY_DESTINATION_SECRET: str = ""
 
 settings = Settings()
